@@ -1,0 +1,12 @@
+[MESSAGES CONTROL]
+disable=missing-function-docstring,
+        missing-class-docstring,
+        missing-module-docstring,
+        W0718, 
+        W0611,
+        W0612,
+        C0411,
+        C0301,
+        C0303,
+        C0304,
+        E0401
