@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Blender",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "python": "/Applications/Blender.app/Contents/Resources/4.0/python/bin/python3.10",
+            "env": {
+                "PYTHONPATH": "/Applications/Blender.app/Contents/Resources/4.0/scripts/modules"
+            }
+        }
+    ]
+}
