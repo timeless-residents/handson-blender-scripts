@@ -112,7 +112,7 @@ def main():
     bpy.context.scene.render.resolution_x = 1920
     bpy.context.scene.render.resolution_y = 1080
     bpy.context.scene.render.image_settings.file_format = "PNG"
-    bpy.context.scene.render.filepath = ".//output//abstract_sculpture.png"
+    bpy.context.scene.render.filepath = ".//output//handson_002.png"
 
     # レンダリングを実行
     bpy.ops.render.render(write_still=True)

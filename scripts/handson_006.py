@@ -81,7 +81,7 @@ def render_image():
         os.makedirs(output_dir)
 
     # 出力ファイルパスの設定
-    scene.render.filepath = os.path.join(output_dir, "fractal_tree.png")
+    scene.render.filepath = os.path.join(output_dir, "handson_006.png")
     scene.render.image_settings.file_format = 'PNG'
 
     # レンダリング実行（静止画）

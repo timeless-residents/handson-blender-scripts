@@ -4,7 +4,7 @@ import time
 
 # 設定
 OUTPUT_DIR = "output"
-FILE_PREFIX = "render"
+FILE_PREFIX = "handson_017"
 FILE_EXTENSION = "png"
 MAX_EXECUTION_TIME = 10  # 秒
 

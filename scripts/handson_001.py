@@ -57,7 +57,7 @@ def main():
 
     # レンダリング設定
     bpy.context.scene.render.image_settings.file_format = "PNG"
-    bpy.context.scene.render.filepath = ".//output//random_cubes.png"
+    bpy.context.scene.render.filepath = ".//output//handson_001.png"
 
     # レンダリングエンジンをCyclesに設定（より良い品質のため）
     bpy.context.scene.render.engine = "CYCLES"

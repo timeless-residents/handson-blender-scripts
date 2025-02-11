@@ -7,7 +7,7 @@ from datetime import datetime
 output_dir = "output"
 
 # 出力ファイルのベース名
-output_base = "wireframe_render"
+output_base = "handson_015"
 
 # 同一ファイルが存在する場合の退避処理
 def backup_existing_file(filepath):

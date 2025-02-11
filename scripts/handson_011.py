@@ -171,7 +171,7 @@ def main():
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
-        output_path = os.path.join(output_dir, "room_lighting.png")
+        output_path = os.path.join(output_dir, "handson_011.png")
         bpy.context.scene.render.filepath = output_path
         print(f"\nレンダリング中... 出力先: {output_path}")
         bpy.ops.render.render(write_still=True)

@@ -235,7 +235,7 @@ def main():
         
         # レンダリングの実行と保存
         output_dir = ensure_output_directory()
-        output_path = os.path.join(output_dir, "material_comparison.png")
+        output_path = os.path.join(output_dir, "handson_010.png")
         bpy.context.scene.render.filepath = output_path
         print(f"\nレンダリング中... 出力先: {output_path}")
         bpy.ops.render.render(write_still=True)

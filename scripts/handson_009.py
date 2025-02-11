@@ -70,7 +70,7 @@ def render_image():
         os.makedirs(output_dir)
 
     # 出力ファイルパスの設定（PNG 形式）
-    scene.render.filepath = os.path.join(output_dir, "procedural_terrain.png")
+    scene.render.filepath = os.path.join(output_dir, "handson_009.png")
     scene.render.image_settings.file_format = 'PNG'
 
     bpy.ops.render.render(write_still=True)

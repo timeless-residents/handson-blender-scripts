@@ -8,7 +8,7 @@ import random
 output_dir = "output"
 
 # 出力ファイルのベース名
-output_base = "starry_sky_vertex"
+output_base = "handson_016"
 
 # レンダリング設定
 cycles_samples = 32 # ある程度品質を保つため

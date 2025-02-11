@@ -59,7 +59,7 @@ def render_image():
         os.makedirs(output_dir)
 
     # 出力ファイルパスの設定
-    scene.render.filepath = os.path.join(output_dir, "auto_array.png")
+    scene.render.filepath = os.path.join(output_dir, "handson_008.png")
     scene.render.image_settings.file_format = 'PNG'
 
     bpy.ops.render.render(write_still=True)

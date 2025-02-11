@@ -200,7 +200,8 @@ def render_output():
         os.makedirs(bpy.path.abspath(output_dir))
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    scene.render.filepath = f"{output_dir}//camo_mesh_{timestamp}.png"
+    # scene.render.filepath = f"{output_dir}//camo_mesh_{timestamp}.png"
+    scene.render.filepath = f"{output_dir}//handson_014.png"
 
     # レンダリング実行
     bpy.ops.render.render(write_still=True)

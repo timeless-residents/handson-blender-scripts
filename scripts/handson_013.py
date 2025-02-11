@@ -125,7 +125,7 @@ def render_comparison():
         os.makedirs(bpy.path.abspath(output_dir))
     
     # レンダリング実行
-    scene.render.filepath = f"{output_dir}//comparison_view.png"
+    scene.render.filepath = f"{output_dir}//handson_013.png"
     bpy.ops.render.render(write_still=True)
 
 def main():

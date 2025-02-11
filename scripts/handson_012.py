@@ -192,7 +192,7 @@ def main():
             os.makedirs(output_dir)
             
         # レンダリング実行と保存
-        output_path = os.path.join(output_dir, "pop_art_text_3d.png")
+        output_path = os.path.join(output_dir, "handson_012.png")
         bpy.context.scene.render.filepath = output_path
         bpy.ops.render.render(write_still=True)
         
