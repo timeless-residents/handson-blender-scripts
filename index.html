@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blender Scripts Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        accent: '#4a9eff',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-white p-5">
+    <header class="text-center mb-8 py-8">
+        <h1 class="text-4xl mb-4 text-accent font-bold">Blender Scripts Gallery</h1>
+        <p class="text-lg">A collection of Blender automation scripts and their outputs</p>
+        <p class="text-gray-400 text-sm mt-4">
+            View the <a href="https://github.com/timeless-residents/handson-blender-scripts" class="text-accent hover:underline">GitHub repository</a>
+        </p>
+    </header>
+
+    <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-5" id="gallery">
+        <!-- Gallery items will be dynamically inserted here -->
+    </main>
+
+    <script>
+        async function loadGallery() {
+            const scripts = [];
+            
+            // Get list of scripts (19 handson scripts)
+            for (let i = 1; i <= 19; i++) {
+                const number = i.toString().padStart(3, '0');
+                scripts.push({
+                    name: `handson_${number}`,
+                    scriptPath: `https://github.com/timeless-residents/handson-blender-scripts/blob/main/scripts/handson_${number}.py`,
+                    outputPath: `output/handson_${number}.mp4`,
+                    number: number
+                });
+            }
+
+            const gallery = document.getElementById('gallery');
+            
+            scripts.forEach(script => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-800 rounded-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300';
+                
+                const mediaContainer = document.createElement('div');
+                mediaContainer.className = 'relative w-full pt-[56.25%] bg-black';
+
+                const mp4Path = `output/handson_${script.number}.mp4`;
+                const pngPath = `output/handson_${script.number}.png`;
+                const downloadLink = document.createElement('a');
+                downloadLink.className = 'text-accent hover:underline text-sm';
+                downloadLink.target = '_blank';
+                downloadLink.textContent = 'Download Output';
+
+                // Try PNG first
+                const img = document.createElement('img');
+                img.className = 'absolute inset-0 w-full h-full object-contain';
+                img.src = pngPath;
+                
+                img.onload = () => {
+                    mediaContainer.innerHTML = '';
+                    mediaContainer.appendChild(img);
+                    downloadLink.href = pngPath;
+                };
+                
+                img.onerror = () => {
+                    // If PNG fails, try MP4
+                    const video = document.createElement('video');
+                    video.controls = true;
+                    video.muted = true;
+                    video.preload = 'metadata';
+                    video.className = 'absolute inset-0 w-full h-full object-contain';
+                    
+                    const source = document.createElement('source');
+                    source.src = mp4Path;
+                    source.type = 'video/mp4';
+                    
+                    video.appendChild(source);
+                    video.onloadeddata = () => {
+                        mediaContainer.innerHTML = '';
+                        mediaContainer.appendChild(video);
+                        downloadLink.href = mp4Path;
+                    };
+                    
+                    video.onerror = () => {
+                        mediaContainer.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-gray-400 italic">Output will be available after running the script</div>';
+                        downloadLink.href = '#';
+                        downloadLink.onclick = (e) => e.preventDefault();
+                    };
+                };
+                
+                const info = document.createElement('div');
+                info.className = 'p-5';
+                
+                info.innerHTML = `
+                    <div class="text-xl mb-2 text-accent">${script.name}</div>
+                    <div class="flex gap-4 mt-4">
+                        <a href="${script.scriptPath}" target="_blank" class="text-accent hover:underline text-sm">View Script #${script.number}</a>
+                        <a href="#" target="_blank" class="text-accent hover:underline text-sm download-link">Download Output</a>
+                    </div>
+                `;
+                
+                item.appendChild(mediaContainer);
+                item.appendChild(info);
+                gallery.appendChild(item);
+            });
+        }
+
+        // Load gallery when page loads
+        document.addEventListener('DOMContentLoaded', loadGallery);
+    </script>
+</body>
+</html>
