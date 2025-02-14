@@ -7,11 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: 'media',
             theme: {
                 extend: {
                     colors: {
-                        accent: '#4a9eff',
+                        accent: {
+                            light: '#3b82f6',
+                            dark: '#60a5fa'
+                        }
                     }
                 }
             }
@@ -19,30 +22,45 @@
     </script>
     <style>
         .video-thumbnail {
-            background-color: #2d3748;
-            background-image: linear-gradient(45deg, #374151 25%, transparent 25%, transparent 75%, #374151 75%, #374151), 
-                            linear-gradient(45deg, #374151 25%, transparent 25%, transparent 75%, #374151 75%, #374151);
+            background-color: #f3f4f6;
+            background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb),
+                            linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb);
             background-size: 20px 20px;
             background-position: 0 0, 10px 10px;
         }
+
+        @media (prefers-color-scheme: dark) {
+            .video-thumbnail {
+                background-color: #1f2937;
+                background-image: linear-gradient(45deg, #111827 25%, transparent 25%, transparent 75%, #111827 75%, #111827),
+                                linear-gradient(45deg, #111827 25%, transparent 25%, transparent 75%, #111827 75%, #111827);
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-white p-5">
-    <header class="text-center mb-8 py-8">
-        <h1 class="text-4xl mb-4 text-accent font-bold">Blender Scripts Gallery</h1>
-        <p class="text-lg">A collection of Blender automation scripts and their outputs</p>
-        <p class="text-gray-400 text-sm mt-4">
-            View the <a href="https://github.com/timeless-residents/handson-blender-scripts" class="text-accent hover:underline">GitHub repository</a>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <header class="text-center py-12 px-4">
+        <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-accent-light to-blue-600 dark:from-accent-dark dark:to-blue-400 text-transparent bg-clip-text">Blender Scripts Gallery</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300">A collection of Blender automation scripts and their outputs</p>
+        <p class="mt-4">
+            <a href="https://github.com/timeless-residents/handson-blender-scripts" 
+               class="inline-flex items-center text-sm text-accent-light dark:text-accent-dark hover:underline">
+                View GitHub Repository
+                <svg class="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+            </a>
         </p>
     </header>
 
-    <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-5" id="gallery">
-        <!-- Gallery items will be dynamically inserted here -->
+    <main class="container mx-auto px-4 pb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery">
+            <!-- Gallery items will be dynamically inserted here -->
+        </div>
     </main>
 
     <script>
         async function loadGallery() {
-            // Configuration object for gallery settings
             const config = {
                 numberPadding: 3,
                 baseScriptPath: 'https://github.com/timeless-residents/handson-blender-scripts/blob/main/scripts',
@@ -75,7 +93,7 @@
                             const match = file.name.match(/handson_(\d+)\.py$/);
                             return parseInt(match[1]);
                         });
-                        return numbers.sort((a, b) => b - a); // Sort in descending order
+                        return numbers.sort((a, b) => b - a);
                     }
                 } catch (error) {
                     console.log('GitHub API check failed, using local scan...');
@@ -83,7 +101,7 @@
 
                 // Fallback: Scan for files locally
                 const scripts = [];
-                for (let i = 1; i <= 100; i++) { // Scan up to a reasonable number
+                for (let i = 1; i <= 100; i++) {
                     const number = i.toString().padStart(config.numberPadding, '0');
                     const path = `${config.baseOutputPath}/handson_${number}`;
                     
@@ -96,7 +114,6 @@
                         if (mp4Exists || pngExists) {
                             scripts.push(i);
                         } else {
-                            // If we find no files for this number, assume we've reached the end
                             break;
                         }
                     } catch (error) {
@@ -107,36 +124,23 @@
                 return scripts.reverse();
             }
 
-            const scriptNumbers = await getScriptNumbers();
-            const scripts = [];
-            for (const i of scriptNumbers) {
-                const number = i.toString().padStart(config.numberPadding, '0');
-                scripts.push({
-                    name: `handson_${number}`,
-                    scriptPath: `${config.baseScriptPath}/handson_${number}.py`,
-                    outputPath: `${config.baseOutputPath}/handson_${number}`,
-                    number: number
-                });
-            }
-    
             const gallery = document.getElementById('gallery');
+            const scriptNumbers = await getScriptNumbers();
             
-            scripts.forEach(script => {
+            scriptNumbers.forEach(i => {
+                const number = i.toString().padStart(config.numberPadding, '0');
                 const item = document.createElement('div');
-                item.className = 'bg-gray-800 rounded-lg overflow-hidden transition-colors duration-200 hover:bg-gray-700';
+                item.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition duration-200 hover:shadow-xl dark:shadow-none';
                 
                 const mediaContainer = document.createElement('div');
                 mediaContainer.className = 'relative w-full pt-[56.25%] video-thumbnail';
     
-                const mp4Path = `${script.outputPath}.mp4`;
-                const pngPath = `${script.outputPath}.png`;
+                const mp4Path = `${config.baseOutputPath}/handson_${number}.mp4`;
+                const pngPath = `${config.baseOutputPath}/handson_${number}.png`;
                 
-                // Try PNG first
                 const img = document.createElement('img');
                 img.className = 'absolute inset-0 w-full h-full object-contain';
                 img.src = pngPath;
-                
-                let downloadLink;
                 
                 const updateDownloadLink = (path) => {
                     const links = item.querySelectorAll('.download-link');
@@ -156,9 +160,9 @@
                 const showPlaceholder = () => {
                     mediaContainer.innerHTML = `
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="text-center">
-                                <div class="text-gray-400 italic mb-2">Output will be available after running the script</div>
-                                <div class="text-sm text-gray-500">${script.name}</div>
+                            <div class="text-center px-4">
+                                <div class="text-gray-400 dark:text-gray-500 italic mb-2">Output will be available after running the script</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">handson_${number}</div>
                             </div>
                         </div>
                     `;
@@ -172,22 +176,19 @@
                 };
                 
                 img.onerror = () => {
-                    // Try to fetch video thumbnail first
                     fetch(mp4Path, { method: 'HEAD' })
                         .then(response => {
                             if (response.ok) {
-                                // If video exists, create video element
                                 const video = document.createElement('video');
                                 video.controls = true;
                                 video.muted = true;
                                 video.playsinline = true;
                                 video.setAttribute('webkit-playsinline', 'true');
                                 video.preload = 'metadata';
-                                video.className = 'absolute inset-0 w-full h-full object-contain';
+                                video.className = 'absolute inset-0 w-full h-full object-contain bg-transparent';
                                 
-                                // Generate thumbnail using canvas
                                 video.addEventListener('loadeddata', () => {
-                                    video.currentTime = 0.1;  // Seek to 0.1s for thumbnail
+                                    video.currentTime = 0.1;
                                 });
 
                                 video.addEventListener('seeked', () => {
@@ -196,8 +197,6 @@
                                     canvas.height = video.videoHeight;
                                     const ctx = canvas.getContext('2d');
                                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                    
-                                    // Set the thumbnail as poster
                                     video.poster = canvas.toDataURL();
                                 });
 
@@ -207,12 +206,10 @@
                                 
                                 video.appendChild(source);
 
-                                // Better error handling
                                 video.addEventListener('error', () => {
                                     showPlaceholder();
                                 });
 
-                                // Touch event handling
                                 let touchStartTime = 0;
                                 video.addEventListener('touchstart', () => {
                                     touchStartTime = Date.now();
@@ -245,10 +242,18 @@
                 info.className = 'p-5';
                 
                 info.innerHTML = `
-                    <div class="text-xl mb-2 text-accent">${script.name}</div>
+                    <div class="text-xl mb-2 font-medium text-gray-900 dark:text-gray-100">handson_${number}</div>
                     <div class="flex gap-4 mt-4">
-                        <a href="${script.scriptPath}" target="_blank" class="text-accent hover:underline text-sm">View Script #${script.number}</a>
-                        <a href="#" target="_blank" class="text-accent hover:underline text-sm download-link">Download Output</a>
+                        <a href="${config.baseScriptPath}/handson_${number}.py" 
+                           target="_blank" 
+                           class="text-sm text-accent-light dark:text-accent-dark hover:underline">
+                            View Script #${number}
+                        </a>
+                        <a href="#" 
+                           target="_blank" 
+                           class="text-sm text-accent-light dark:text-accent-dark hover:underline download-link">
+                            Download Output
+                        </a>
                     </div>
                 `;
                 
@@ -258,7 +263,6 @@
             });
         }
     
-        // Load gallery when page loads
         document.addEventListener('DOMContentLoaded', loadGallery);
     </script>
 </body>
