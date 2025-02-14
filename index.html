@@ -17,6 +17,15 @@
             }
         }
     </script>
+    <style>
+        .video-thumbnail {
+            background-color: #2d3748;
+            background-image: linear-gradient(45deg, #374151 25%, transparent 25%, transparent 75%, #374151 75%, #374151), 
+                            linear-gradient(45deg, #374151 25%, transparent 25%, transparent 75%, #374151 75%, #374151);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white p-5">
     <header class="text-center mb-8 py-8">
@@ -41,7 +50,7 @@
                 scripts.push({
                     name: `handson_${number}`,
                     scriptPath: `https://github.com/timeless-residents/handson-blender-scripts/blob/main/scripts/handson_${number}.py`,
-                    outputPath: `output/handson_${number}`,  // 拡張子なしのベースパス
+                    outputPath: `output/handson_${number}`,
                     number: number
                 });
             }
@@ -50,10 +59,10 @@
             
             scripts.forEach(script => {
                 const item = document.createElement('div');
-                item.className = 'bg-gray-800 rounded-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300';
+                item.className = 'bg-gray-800 rounded-lg overflow-hidden transition-colors duration-200 hover:bg-gray-700';
                 
                 const mediaContainer = document.createElement('div');
-                mediaContainer.className = 'relative w-full pt-[56.25%] bg-black';
+                mediaContainer.className = 'relative w-full pt-[56.25%] video-thumbnail';
     
                 const mp4Path = `${script.outputPath}.mp4`;
                 const pngPath = `${script.outputPath}.png`;
@@ -79,6 +88,18 @@
                         }
                     });
                 };
+
+                const showPlaceholder = () => {
+                    mediaContainer.innerHTML = `
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-gray-400 italic mb-2">Output will be available after running the script</div>
+                                <div class="text-sm text-gray-500">${script.name}</div>
+                            </div>
+                        </div>
+                    `;
+                    updateDownloadLink(null);
+                };
                 
                 img.onload = () => {
                     mediaContainer.innerHTML = '';
@@ -87,28 +108,73 @@
                 };
                 
                 img.onerror = () => {
-                    // If PNG fails, try MP4
-                    const video = document.createElement('video');
-                    video.controls = true;
-                    video.muted = true;
-                    video.preload = 'metadata';
-                    video.className = 'absolute inset-0 w-full h-full object-contain';
-                    
-                    const source = document.createElement('source');
-                    source.src = mp4Path;
-                    source.type = 'video/mp4';
-                    
-                    video.appendChild(source);
-                    video.onloadeddata = () => {
-                        mediaContainer.innerHTML = '';
-                        mediaContainer.appendChild(video);
-                        updateDownloadLink(mp4Path);
-                    };
-                    
-                    video.onerror = () => {
-                        mediaContainer.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-gray-400 italic">Output will be available after running the script</div>';
-                        updateDownloadLink(null);
-                    };
+                    // Try to fetch video thumbnail first
+                    fetch(mp4Path, { method: 'HEAD' })
+                        .then(response => {
+                            if (response.ok) {
+                                // If video exists, create video element
+                                const video = document.createElement('video');
+                                video.controls = true;
+                                video.muted = true;
+                                video.playsinline = true;
+                                video.setAttribute('webkit-playsinline', 'true');
+                                video.preload = 'metadata';
+                                video.className = 'absolute inset-0 w-full h-full object-contain';
+                                
+                                // Generate thumbnail using canvas
+                                video.addEventListener('loadeddata', () => {
+                                    video.currentTime = 0.1;  // Seek to 0.1s for thumbnail
+                                });
+
+                                video.addEventListener('seeked', () => {
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = video.videoWidth;
+                                    canvas.height = video.videoHeight;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                    
+                                    // Set the thumbnail as poster
+                                    video.poster = canvas.toDataURL();
+                                });
+
+                                const source = document.createElement('source');
+                                source.src = mp4Path;
+                                source.type = 'video/mp4';
+                                
+                                video.appendChild(source);
+
+                                // Better error handling
+                                video.addEventListener('error', () => {
+                                    showPlaceholder();
+                                });
+
+                                // Touch event handling
+                                let touchStartTime = 0;
+                                video.addEventListener('touchstart', () => {
+                                    touchStartTime = Date.now();
+                                });
+
+                                video.addEventListener('touchend', () => {
+                                    const touchDuration = Date.now() - touchStartTime;
+                                    if (touchDuration < 200) {
+                                        if (video.paused) {
+                                            video.play().catch(err => console.error('Playback failed:', err));
+                                        } else {
+                                            video.pause();
+                                        }
+                                    }
+                                });
+                                
+                                mediaContainer.innerHTML = '';
+                                mediaContainer.appendChild(video);
+                                updateDownloadLink(mp4Path);
+                            } else {
+                                showPlaceholder();
+                            }
+                        })
+                        .catch(() => {
+                            showPlaceholder();
+                        });
                 };
                 
                 const info = document.createElement('div');
