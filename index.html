@@ -42,15 +42,79 @@
 
     <script>
         async function loadGallery() {
+            // Configuration object for gallery settings
+            const config = {
+                numberPadding: 3,
+                baseScriptPath: 'https://github.com/timeless-residents/handson-blender-scripts/blob/main/scripts',
+                baseOutputPath: 'output',
+                githubApiPath: 'https://api.github.com/repos/timeless-residents/handson-blender-scripts/contents/scripts'
+            };
+
+            async function getScriptNumbers() {
+                try {
+                    // First try: Check output directory
+                    const outputFiles = await fetch(`${config.baseOutputPath}/`).then(res => res.text());
+                    if (outputFiles) {
+                        const matches = [...outputFiles.matchAll(/handson_(\d+)\.(mp4|png)/g)];
+                        if (matches.length > 0) {
+                            const numbers = [...new Set(matches.map(match => parseInt(match[1])))];
+                            return numbers.sort((a, b) => b - a); // Sort in descending order
+                        }
+                    }
+                } catch (error) {
+                    console.log('Output directory check failed, trying GitHub API...');
+                }
+
+                try {
+                    // Second try: Use GitHub API
+                    const response = await fetch(config.githubApiPath);
+                    if (response.ok) {
+                        const files = await response.json();
+                        const scriptFiles = files.filter(file => file.name.match(/handson_\d+\.py$/));
+                        const numbers = scriptFiles.map(file => {
+                            const match = file.name.match(/handson_(\d+)\.py$/);
+                            return parseInt(match[1]);
+                        });
+                        return numbers.sort((a, b) => b - a); // Sort in descending order
+                    }
+                } catch (error) {
+                    console.log('GitHub API check failed, using local scan...');
+                }
+
+                // Fallback: Scan for files locally
+                const scripts = [];
+                for (let i = 1; i <= 100; i++) { // Scan up to a reasonable number
+                    const number = i.toString().padStart(config.numberPadding, '0');
+                    const path = `${config.baseOutputPath}/handson_${number}`;
+                    
+                    try {
+                        const [mp4Exists, pngExists] = await Promise.all([
+                            fetch(`${path}.mp4`, { method: 'HEAD' }).then(res => res.ok),
+                            fetch(`${path}.png`, { method: 'HEAD' }).then(res => res.ok)
+                        ]);
+                        
+                        if (mp4Exists || pngExists) {
+                            scripts.push(i);
+                        } else {
+                            // If we find no files for this number, assume we've reached the end
+                            break;
+                        }
+                    } catch (error) {
+                        break;
+                    }
+                }
+                
+                return scripts.reverse();
+            }
+
+            const scriptNumbers = await getScriptNumbers();
             const scripts = [];
-            
-            // Get list of scripts (19 handson scripts)
-            for (let i = 1; i <= 19; i++) {
-                const number = i.toString().padStart(3, '0');
+            for (const i of scriptNumbers) {
+                const number = i.toString().padStart(config.numberPadding, '0');
                 scripts.push({
                     name: `handson_${number}`,
-                    scriptPath: `https://github.com/timeless-residents/handson-blender-scripts/blob/main/scripts/handson_${number}.py`,
-                    outputPath: `output/handson_${number}`,
+                    scriptPath: `${config.baseScriptPath}/handson_${number}.py`,
+                    outputPath: `${config.baseOutputPath}/handson_${number}`,
                     number: number
                 });
             }
