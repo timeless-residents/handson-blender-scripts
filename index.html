@@ -41,11 +41,11 @@
                 scripts.push({
                     name: `handson_${number}`,
                     scriptPath: `https://github.com/timeless-residents/handson-blender-scripts/blob/main/scripts/handson_${number}.py`,
-                    outputPath: `output/handson_${number}.mp4`,
+                    outputPath: `output/handson_${number}`,  // 拡張子なしのベースパス
                     number: number
                 });
             }
-
+    
             const gallery = document.getElementById('gallery');
             
             scripts.forEach(script => {
@@ -54,23 +54,36 @@
                 
                 const mediaContainer = document.createElement('div');
                 mediaContainer.className = 'relative w-full pt-[56.25%] bg-black';
-
-                const mp4Path = `output/handson_${script.number}.mp4`;
-                const pngPath = `output/handson_${script.number}.png`;
-                const downloadLink = document.createElement('a');
-                downloadLink.className = 'text-accent hover:underline text-sm';
-                downloadLink.target = '_blank';
-                downloadLink.textContent = 'Download Output';
-
+    
+                const mp4Path = `${script.outputPath}.mp4`;
+                const pngPath = `${script.outputPath}.png`;
+                
                 // Try PNG first
                 const img = document.createElement('img');
                 img.className = 'absolute inset-0 w-full h-full object-contain';
                 img.src = pngPath;
                 
+                let downloadLink;
+                
+                const updateDownloadLink = (path) => {
+                    const links = item.querySelectorAll('.download-link');
+                    links.forEach(link => {
+                        if (path) {
+                            link.href = path;
+                            link.classList.remove('opacity-50', 'cursor-not-allowed');
+                            link.onclick = null;
+                        } else {
+                            link.href = '#';
+                            link.classList.add('opacity-50', 'cursor-not-allowed');
+                            link.onclick = (e) => e.preventDefault();
+                        }
+                    });
+                };
+                
                 img.onload = () => {
                     mediaContainer.innerHTML = '';
                     mediaContainer.appendChild(img);
-                    downloadLink.href = pngPath;
+                    updateDownloadLink(pngPath);
                 };
                 
                 img.onerror = () => {
@@ -89,13 +102,12 @@
                     video.onloadeddata = () => {
                         mediaContainer.innerHTML = '';
                         mediaContainer.appendChild(video);
-                        downloadLink.href = mp4Path;
+                        updateDownloadLink(mp4Path);
                     };
                     
                     video.onerror = () => {
                         mediaContainer.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-gray-400 italic">Output will be available after running the script</div>';
-                        downloadLink.href = '#';
-                        downloadLink.onclick = (e) => e.preventDefault();
+                        updateDownloadLink(null);
                     };
                 };
                 
@@ -115,7 +127,7 @@
                 gallery.appendChild(item);
             });
         }
-
+    
         // Load gallery when page loads
         document.addEventListener('DOMContentLoaded', loadGallery);
     </script>
