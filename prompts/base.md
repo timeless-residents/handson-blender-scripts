@@ -1,4 +1,4 @@
-M2 Mac Studio Blender version 4.0.2 で、
+M2 Mac Studio Blender version 4.3.2 で、
 blender  --background --python script.py
 が動く環境を想定して、script.pyを下記の要件に基づいて作成してください。
 
