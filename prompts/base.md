@@ -9,3 +9,4 @@ blender  --background --python script.py
 - 同一ファイルが存在する場合は退避して作成してください
 - ライブラリはbpyを使って実装してください。
 - 主要なPyLintを含むWARNINGが出ない実装とします
+- カメラはレンダリング対象を中央に移せる構図とします
